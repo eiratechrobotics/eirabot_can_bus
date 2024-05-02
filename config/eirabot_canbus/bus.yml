@@ -1,0 +1,207 @@
+options:
+  dcf_path: "/home/brianwaters/workspaces/eirabot_ws/install/eirabot_can_bus/share/eirabot_can_bus/config/eirabot_canbus"
+
+master:
+  node_id: 7
+  baudrate: 800
+  driver: "ros2_canopen::MasterDriver"
+  package: "canopen_master_driver"
+  sync_period: 10000
+
+top_camera:
+  node_id: 14
+  dcf: "camera.eds"
+  driver: "ros2_canopen::Pgv150iDriver"
+  package: "canopen_pgv150i_driver"
+  polling: true
+  period: 10
+
+left_wheel_joint:
+  node_id: 5
+  dcf: "cia402_slave_n5.eds"
+  driver: "ros2_canopen::Cia402Driver"
+  package: "canopen_402_driver"
+  period: 10
+  velocity_mode: 1
+  revision_number: 0
+  sdo:
+    - {index: 0x60C2, sub_index: 1, value: 50} # Set interpolation time for cyclic modes to 50 ms
+    - {index: 0x60C2, sub_index: 2, value: -3} # Set base 10-3s
+    - {index: 0x6081, sub_index: 0, value: 0} # Profile Velocity
+    - {index: 0x6083, sub_index: 0, value: 60000} # Velocity Acceleration
+    - {index: 0x6060, sub_index: 0, value: 1} # Mode of Operation
+    - {index: 0x3150, sub_index: 0, value: 2} # Brakes
+    - {index: 0x3221, sub_index: 0, value: 50000} # Current Positive
+    - {index: 0x3223, sub_index: 0, value: 50000} # Current Negative
+    - {index: 0x3224, sub_index: 1, value: 50000} # Dynamic current limit peak
+    - {index: 0x3224, sub_index: 2, value: 50000} # Dynamic current limit continuous
+    - {index: 0x3224, sub_index: 3, value: 2000} # Dynamic current limit time
+    # - {index: 0x3310, sub_index: 0, value: 800} # PID Gain
+    - {index: 0x3311, sub_index: 0, value: 0} # PID Integral Factor
+    - {index: 0x3312, sub_index: 0, value: 0} # PID differential factor      
+    - {index: 0x3312, sub_index: 1, value: 5} # PID differential factor stop    
+    - {index: 0x3321, sub_index: 0, value: 3700} # Max Velocity Pos
+    - {index: 0x3323, sub_index: 0, value: 3700} # Max Velocity Neg 
+    - {index: 0x3344, sub_index: 0, value: 15000} # Quick-stop deceleration - delta V 
+    - {index: 0x3380, sub_index: 0, value: 180000} # Acceleration
+    - {index: 0x3381, sub_index: 0, value: 180000} # Deceleration
+    - {index: 0x3382, sub_index: 0, value: 230000} # Quick Stop Deceleration
+    - {index: 0x3510, sub_index: 0, value: 900} # SVel PI-Controller - gain
+    - {index: 0x3511, sub_index: 0, value: 125} # SVel PI-Controller - integral factor
+    - {index: 0x3900, sub_index: 0, value: 1} # Motor Type
+    - {index: 0x3902, sub_index: 0, value: 48000} # Voltage
+    - {index: 0x3910, sub_index: 0, value: 8} # Pole Number
+    - {index: 0x3911, sub_index: 0, value: 25} # Polarity
+    - {index: 0x3962, sub_index: 0, value: 4096} # Encoders
+  
+
+  tpdo: # TPDO needed statusword, actual velocity, actual position, mode of operation
+    1:
+      enabled: true
+      cob_id: "auto"
+      transmission: 0x01
+      mapping:
+        - {index: 0x6041, sub_index: 0} # status word
+        - {index: 0x6061, sub_index: 0} # mode of operation display
+    2:
+      enabled: true
+      cob_id: "auto"
+      transmission: 0x01
+      mapping:
+        - {index: 0x6064, sub_index: 0} # position actual value
+        - {index: 0x606c, sub_index: 0} # velocity actual position
+  rpdo: # RPDO needed controlword, target position, target velocity, mode of operation
+    1:
+      enabled: true
+      cob_id: "auto"
+      mapping:
+      - {index: 0x6040, sub_index: 0} # controlword
+      - {index: 0x6060, sub_index: 0} # mode of operation
+    2:
+      enabled: true
+      cob_id: "auto"
+      mapping:
+      - {index: 0x607A, sub_index: 0} # target position
+      - {index: 0x60FF, sub_index: 0} # target velocity
+
+right_wheel_joint:
+  node_id: 6
+  dcf: "cia402_slave_n6.eds"
+  driver: "ros2_canopen::Cia402Driver"
+  package: "canopen_402_driver"
+  period: 10
+  velocity_mode: 1
+  revision_number: 0
+  switching_state: 2
+  sdo:
+    - {index: 0x60C2, sub_index: 1, value: 50} # Set interpolation time for cyclic modes to 50 ms
+    - {index: 0x60C2, sub_index: 2, value: -3} # Set base 10-3s
+    - {index: 0x6081, sub_index: 0, value: 0}
+    - {index: 0x6083, sub_index: 0, value: 60000}
+    - {index: 0x6060, sub_index: 0, value: 1}
+    - {index: 0x3150, sub_index: 0, value: 2} # Brakes
+    - {index: 0x3221, sub_index: 0, value: 50000} # Current Positive
+    - {index: 0x3223, sub_index: 0, value: 50000} # Current Negative
+    - {index: 0x3224, sub_index: 1, value: 50000} # Dynamic current limit peak
+    - {index: 0x3224, sub_index: 2, value: 50000} # Dynamic current limit continuous
+    - {index: 0x3224, sub_index: 3, value: 2000} # Dynamic current limit time
+    # - {index: 0x3310, sub_index: 0, value: 800} # PID Gain
+    - {index: 0x3311, sub_index: 0, value: 0} # PID Integral Factor
+    - {index: 0x3312, sub_index: 0, value: 0} # PID differential factor      
+    - {index: 0x3312, sub_index: 1, value: 5} # PID differential factor stop    
+    - {index: 0x3321, sub_index: 0, value: 3700} # Max Velocity Pos
+    - {index: 0x3323, sub_index: 0, value: 3700} # Max Velocity Neg 
+    - {index: 0x3344, sub_index: 0, value: 15000} # Quick-stop deceleration - delta V 
+    - {index: 0x3380, sub_index: 0, value: 180000} # Acceleration
+    - {index: 0x3381, sub_index: 0, value: 180000} # Deceleration
+    - {index: 0x3382, sub_index: 0, value: 230000} # Quick Stop Deceleration
+    - {index: 0x3510, sub_index: 0, value: 900} # SVel PI-Controller - gain
+    - {index: 0x3511, sub_index: 0, value: 125} # SVel PI-Controller - integral factor
+    - {index: 0x3900, sub_index: 0, value: 1} # Motor Type
+    - {index: 0x3902, sub_index: 0, value: 48000} # Voltage
+    - {index: 0x3910, sub_index: 0, value: 8} # Pole Number
+    - {index: 0x3911, sub_index: 0, value: 2} # Polarity
+    - {index: 0x3962, sub_index: 0, value: 4096} # Encoders
+    
+  tpdo: # TPDO needed statusword, actual velocity, actual position, mode of operation
+    1:
+      enabled: true
+      cob_id: "auto"
+      transmission: 0x01
+      mapping:
+        - {index: 0x6041, sub_index: 0} # status word
+        - {index: 0x6061, sub_index: 0} # mode of operation display
+    2:
+      enabled: true
+      cob_id: "auto"
+      transmission: 0x01
+      mapping:
+        - {index: 0x6064, sub_index: 0} # position actual value
+        - {index: 0x606c, sub_index: 0} # velocity actual position
+  rpdo: # RPDO needed controlword, target position, target velocity, mode of operation
+    1:
+      enabled: true
+      cob_id: "auto"
+      mapping:
+      - {index: 0x6040, sub_index: 0} # controlword
+      - {index: 0x6060, sub_index: 0} # mode of operation
+    2:
+      enabled: true
+      cob_id: "auto"
+      mapping:
+      - {index: 0x607A, sub_index: 0} # target position
+      - {index: 0x60FF, sub_index: 0} # target velocity
+
+turntable_joint:
+  node_id: 4
+  dcf: "cia402_slave_n4.eds"
+  driver: "ros2_canopen::Cia402Driver"
+  package: "canopen_402_driver"
+  period: 10 # 1 ms
+  heartbeat_producer: 1000 # Heartbeat every 1000 ms
+  velocity_mode: 1 # Profile Position Mode
+  sdo: # SDO executed during config
+        - {index: 0x6081, sub_index: 0, value: 1000} # Set Profile Velocity
+        - {index: 0x6083, sub_index: 0, value: 10000} # Set Profile Acceleration
+        - {index: 0x6084, sub_index: 0, value: 10000} # Set Profile Deceleration
+        - {index: 0x6085, sub_index: 0, value: 10000} # Set Quickstop Deceleration
+        - {index: 0x6098, sub_index: 0, value: 0} # Set default Homing Method to 0 (No homing operation required)
+        - {index: 0x60C2, sub_index: 1, value: 50} # Set Interpolation Time Period Value to 50 ms
+        - {index: 0x60C2, sub_index: 2, value: -3} # Set Interpolation Time Index to 10-3s
+  tpdo: # TPDO needed statusword, actual velocity, actual position, mode of operation
+    1:
+      enabled: true
+      cob_id: "auto"
+      transmission: 0x01
+      mapping:
+        - {index: 0x6041, sub_index: 0} # status word
+        - {index: 0x6061, sub_index: 0} # mode of operation display
+    2:
+      enabled: true
+      cob_id: "auto"
+      transmission: 0x01
+      mapping:
+        - {index: 0x6064, sub_index: 0} # position actual value
+        - {index: 0x606c, sub_index: 0} # velocity actual position
+  rpdo: # RPDO needed controlword, target position, target velocity, mode of operation
+    1:
+      enabled: true
+      cob_id: "auto"
+      mapping:
+      - {index: 0x6040, sub_index: 0} # controlword
+      - {index: 0x6060, sub_index: 0} # mode of operation
+    2:
+      enabled: true
+      cob_id: "auto"
+      mapping:
+      - {index: 0x607A, sub_index: 0} # target position
+      - {index: 0x60FF, sub_index: 0} # target velocity
+
+# The PSU CAN node can cause issues so have it commented out at the moment
+
+# vertical_joint:
+#   node_id: 59
+#   dcf: "psumod.eds"
+#   driver: "ros2_canopen::ProxyDriver"
+#   package: "canopen_proxy_driver"
+  
