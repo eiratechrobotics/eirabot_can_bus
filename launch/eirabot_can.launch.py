@@ -17,6 +17,7 @@ from launch.actions import RegisterEventHandler
 from launch.event_handlers import OnProcessExit
 def generate_launch_description():
     ld = LaunchDescription()
+    # device container for ros2 CANopen
     device_container_1 = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             [
@@ -43,9 +44,11 @@ def generate_launch_description():
         }.items(),
     )
     ld.add_action(device_container_1)
+    # CAN interface
     can_interface_name = "can0"
     package_name = "dunker_motor_control"
 
+    # path to urdf
     robot_description_content = Command(
         [
             PathJoinSubstitution([FindExecutable(name="xacro")]),
@@ -63,10 +66,11 @@ def generate_launch_description():
         ]
     )
     robot_description = {"robot_description": robot_description_content}
+
+    # Adding controller node from dunker motor_control 
     robot_control_config = PathJoinSubstitution(
         [FindPackageShare(package_name), "config/eirabot_control", "ros2_controllers.yaml"]
     )
-
     control_node = Node(
         package="controller_manager",
         executable="ros2_control_node",
@@ -74,18 +78,20 @@ def generate_launch_description():
         output="screen",
     )
 
+    # broadcast state of joints node
     joint_state_broadcaster_spawner = Node(
         package="controller_manager",
         executable="spawner",
         arguments=["joint_state_broadcaster", "--controller-manager", "/controller_manager"],
     )
-
+    # node for use ros2_control
+    # manages controllers lifecycles, access to hardware interfaces and other serivces 
     robot_controller_spawner = Node(
         package="controller_manager",
         executable="spawner",
         arguments=["diffbot_base_controller", "--controller-manager", "/controller_manager"],
     )
-
+    # publish joint and links locations of robot
     robot_state_publisher_node = Node(
         package="robot_state_publisher",
         executable="robot_state_publisher",
@@ -95,6 +101,7 @@ def generate_launch_description():
             ("/diff_drive_controller/cmd_vel_unstamped", "/cmd_vel"),
         ],
     )
+    # launch camera node
     camera_transformer_node = Node(
         package='canopen_pgv150i_tests',
         executable='camera_node'
@@ -108,8 +115,12 @@ def generate_launch_description():
         parameters=[twist_mux_params],
         remappings=[('/cmd_vel_out','/diffbot_base_controller/cmd_vel_unstamped')]
     )
+    os.system("sudo modprobe peak_usb")
+    os.system("sudo ip link set can0 up type can bitrate 800000")
+    os.system("sudo ip link set can0 txqueuelen 1000")
+    os.system("sudo ip link set up can0")
 
-
+    # Add nodes to lanch description
     ld.add_action(control_node)
     ld.add_action(joint_state_broadcaster_spawner)
     ld.add_action(robot_controller_spawner)
