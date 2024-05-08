@@ -62,13 +62,6 @@ ros2 service call /vertical_joint/sdo_write canopen_interfaces/srv/COWrite "{ind
 ros2 service call /vertical_joint/sdo_write canopen_interfaces/srv/COWrite "{index: 0x2300, subindex: 0, data: 0}"
 ```
 
-## Controlling robot with Keyboard
-
-To control the robot with key board you can you use teleop twist but make sure to remap cmd_vel to /diffbot_base_controller/cmd_vel_unstamped
-
-```bash
-ros2 run teleop_twist_keyboard teleop_twist_keyboard --ros-args -r /cmd_vel:=/diffbot_base_controller/cmd_vel_unstamped
-```
-
 ### High Level Diagram
+![Eirabot_canOpen diagram](https://github.com/eiratechrobotics/eirabot_can_bus/assets/156085267/8f9b4172-b07f-43fe-a441-464b7a02a83f)
 
